@@ -44,6 +44,35 @@ def nao_speak(nao_ip, nao_port, text="Bonjour, je suis NAO!"):
     tts.say(text)  # NAO prononce le texte donné
     print("NAO a dit:", text)
 
+def nao_recognise(nao_ip, nao_port):
+    """Reconnaît un objet à l'aide de la caméra du bas de NAO"""
+    vision = ALProxy("ALVisionRecognition", nao_ip, nao_port)  # Proxy pour la reconnaissance visuelle
+    memory = ALProxy("ALMemory", nao_ip, nao_port)  # Proxy pour la mémoire
+    
+    # Démarre la reconnaissance d'objets
+    vision.subscribe("VisionRecognitionTest")
+    
+    # Attendre un peu pour la reconnaissance (2 secondes pour avoir des objets identifiés)
+    time.sleep(2)
+    
+    # Récupère les objets reconnus de la mémoire
+    objects = memory.getData("ALVisionRecognition/RecognizedObjects")
+    
+    # Désabonnement pour libérer les ressources
+    vision.unsubscribe("VisionRecognitionTest")
+    
+    if objects:
+        # Parcourir les objets reconnus
+        for obj in objects:
+            # obj[0] contient le nom de l'objet reconnu (e.g., "balle")
+            if "balle" in obj[0].lower():  # Vérifie si l'objet est une balle
+                print("NAO a reconnu une balle!")
+                nao_speak(nao_ip, nao_port, "Je vois une balle!")
+                return
+
+    # Si aucun objet n'est reconnu
+    print("NAO n'a rien reconnu.")
+    nao_speak(nao_ip, nao_port, "Je ne reconnais rien.")
 
 def nao_sit_down(nao_ip, nao_port):
     """Fait s'asseoir NAO"""
@@ -67,5 +96,7 @@ if __name__ == "__main__":
     nao_raise_left_arm(NAO_IP, NAO_PORT)  # Lève le bras gauche
     time.sleep(2)  # Pause de 2 secondes
     nao_speak(NAO_IP, NAO_PORT, "Je peux faire plusieurs mouvements!")  # NAO parle
+    time.sleep(2)  # Pause de 2 secondes
+    nao_recognise(NAO_IP, NAO_PORT)  # Reconnais la balle à partir de sa base de données
     time.sleep(2)  # Pause de 2 secondes
     nao_sit_down(NAO_IP, NAO_PORT)  # Fait s'asseoir NAO
