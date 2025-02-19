@@ -2,7 +2,7 @@
 from naoqi import ALProxy
 import time
 
-robot_ip = "192.168.143.30"
+robot_ip = "192.168.0.110"
 port = 9559
 
 motion = ALProxy("ALMotion", robot_ip, port)

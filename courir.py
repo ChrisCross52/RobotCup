@@ -23,5 +23,5 @@ def courir(robot_ip, port=9559, speed=1.0, duration=5):
         print("Erreur de connexion ou d'exécution :", e)
 
 if __name__ == "__main__":
-    robot_ip = "192.168.143.30"  
+    robot_ip = "192.168.0.110"  
     courir(robot_ip, speed=1.0, duration=5)
