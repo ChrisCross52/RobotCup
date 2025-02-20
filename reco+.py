@@ -1,0 +1,1 @@
+# Le robot commence dos au qr code, il doit tourner sur lui même jusqu'à reconnaitre le qr code et avancer jusqu'à celui-ci (il doit toujours être en reconnaissance)
