@@ -2,6 +2,7 @@
 from naoqi import ALProxy
 import time
 import re  # Pour extraire la valeur de distance depuis le nom de l'image
+import math  # Pour convertir les degrés en radians
 
 # Connexion au robot
 robot_ip = "192.168.0.110"
@@ -20,15 +21,21 @@ motion.wakeUp()
 vision.subscribe("VisionRecognitionTest")
 print("Recherche d'images en cours...")
 
-# Faire tourner NAO jusqu'à reconnaissance
-# motion.setAngles("HeadYaw", 0.0, 0.1)  # Centre la tête
-# motion.move(0, 0, 0.5)  # NAO tourne sur lui-même à vitesse angulaire de 0.5 rad/s
-
+# Initialisation
 qr_detected = False
 distance = 0  # Distance à parcourir après reconnaissance
 image_name = ""
+rotation_angle = 45  # Degré par étape
+rotation_radian = math.radians(rotation_angle)  # Conversion en radians
 
 while not qr_detected:
+    # Tourne de 45° vers la gauche
+    motion.moveTo(0, 0, rotation_radian)
+    
+    # Attendre 2 secondes pour l'analyse
+    time.sleep(2)
+
+    # Vérifier s'il y a une image reconnue
     data = memory.getData("PictureDetected")
 
     if data and isinstance(data, list) and len(data) > 1:
@@ -37,7 +44,8 @@ while not qr_detected:
         if detected_labels:
             image_name = detected_labels[0]  # On prend le premier élément reconnu
             print("Image reconnue : {}".format(image_name))
-            
+            tts.say("J'ai reconnu une image")
+
             # Sauvegarder le nom du fichier dans un fichier texte
             with open("/home/nao/recognized_image.txt", "w") as file:
                 file.write(image_name)
@@ -47,13 +55,15 @@ while not qr_detected:
             if match:
                 distance = int(match.group(1)) / 100.0  # Convertir en mètres
                 qr_detected = True
-                # motion.stopMove()  # Arrêter la rotation
+                break  # Sortir de la boucle une fois la correspondance trouvée
 
-    time.sleep(0.5)  # Vérification toutes les 500ms
+# Arrêter NAO de tourner
+motion.stopMove()
 
 # Faire avancer NAO vers l'objet reconnu
 if distance > 0:
     print("Avancement de {} mètres".format(distance))
+    tts.say("J'avance de {} mètres".format(distance))
     motion.moveTo(distance, 0, 0)  # Avancer selon la distance extraite
 
 # Désactiver la reconnaissance après utilisation
