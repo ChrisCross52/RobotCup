@@ -21,7 +21,7 @@ motion.wakeUp()
 vision.subscribe("VisionRecognitionTest")
 print("Recherche d'images en cours...")
 
-# Initialisation
+# Initialisations
 qr_detected = False
 distance = 0  # Distance à parcourir après reconnaissance
 image_name = ""
